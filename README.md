@@ -1,6 +1,3 @@
-# Project: TCP P2P
-Angular Frontend for "Regionaler Strommarkt". Ansprechpartner: Sybille Breunig, Ron Kunitzky, Janis Lütgemeier, Sebastian Eggers
-
 ## Folder and file structure
 The relevant folders and files for the production are listed here.
 
