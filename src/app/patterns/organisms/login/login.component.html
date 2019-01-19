@@ -1,0 +1,30 @@
+<div class="loginForm" [ngStyle]="{ 'border-color': 'hsl(' + colorService.getLowOpacityColor(brandingColor.brandingColor01) + ')' }">
+
+    <form class="loginForm__form" [formGroup]="loginFormGroup" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+
+        <fieldset class="loginForm__form__fieldset">
+            <h3 class="loginForm__headline" [innerHTML]="loginData.headline"></h3>
+
+            <p>
+                <label class="loginForm__form__label" for="email" [innerHTML]="loginData.labelEmail"></label>
+                <input type="email" id="email" name="email" formControlName="email">
+            </p>
+            <p>
+                <label class="loginForm__form__label" for="password" [innerHTML]="loginData.labelPassword"></label>
+                <input type="password" id="password" formControlName="password">
+            </p>
+            <div class="loginForm__form__error" *ngIf="(loginFormGroup.get('email').invalid && loginFormGroup.get('email').touched) && !loginErrorText">{{
+                errorMessages.validation.email }}</div>
+            <div class="loginForm__form__error" *ngIf="loginErrorText">{{
+                errorMessages.validation.loginError }}</div>
+            <p>
+                <button class="loginForm__form__button" type="submit" [disabled]="loginForm.invalid" [ngStyle]="{ 'background-color': 'hsl(' + colorService.getColor(brandingColor.brandingColor01) + ')' }">
+                    {{ loginData.submitButton }}
+                </button>
+            </p>
+            <div class="loginForm__password-forgotten">
+                <a [routerLink]="['/' + whitelabel, 'passwort-hilfe']" routerLinkActive="active" [innerHTML]="loginData.passwordForgotten" [ngStyle]="{ 'color': 'hsl(' + colorService.getColor(brandingColor.brandingColor01) + ')' }"></a>
+            </div>
+        </fieldset>
+    </form>
+</div>

@@ -1,0 +1,73 @@
+stages:
+    - Build Application
+    - Build Push And Deploy Docker
+variables:
+    APPLICATION_NAME: p2p-frontend-angular
+    BRANCH_NAME: $CI_COMMIT_REF_NAME
+Build Application Angular:
+    stage: Build Application
+    image: node:10
+    artifacts:
+      expire_in: 120 mins
+      name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+      paths:
+        - dist/*
+    script:
+      - npm ci
+      - npm install -g @angular/cli
+      - npm run postinstall
+      - npm run lint
+      - npm run tslint
+      - npm run stylelint
+      - npm run htmllint
+      - npm run build:prerender
+      - ls
+    only:
+      - develop
+      - qa
+      - master
+      - /^feature.*$/
+    tags:
+      - shared-cps
+Protect Application:
+    stage: Build Application
+    image: mhenry07/apache2-utils
+    artifacts:
+      expire_in: 120 mins
+      name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+      paths:
+        - .htpasswd
+    script:
+      - htpasswd -cdb .htpasswd $BASIC_AUTH_USER $BASIC_AUTH_PASSWORD
+    only:
+      - develop
+      - qa
+      - master
+    tags:
+      - shared-cps
+Build Push And Deploy:
+    stage: Build Push And Deploy Docker
+    image: docker:stable
+    dependencies:
+      - Build Application Angular
+      - Protect Application
+    services:
+      - docker:dind
+    script:
+      - >
+        if [ -f .htpasswd ]; then
+          echo "htpasswd file found. So NGINX needs to be protected. Applying protect conf."
+          rm nginx.conf
+          cp nginx-protected.conf nginx.conf
+        else
+          touch .htpasswd
+        fi
+      - docker login -u $AZR_USER -p $AZR_PASSWORD $AZR_CR
+      - docker build -t $AZR_CR/$APPLICATION_NAME:$BRANCH_NAME .
+      - docker push $AZR_CR/$APPLICATION_NAME:$BRANCH_NAME
+    only:
+      - develop
+      - qa
+      - master
+    tags:
+      - privileged

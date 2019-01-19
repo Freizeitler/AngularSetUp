@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /assets
+Disallow: /leaflet
+Sitemap: https://p2p-frontend-angular-prod.azurewebsites.net/sitemap.xml
